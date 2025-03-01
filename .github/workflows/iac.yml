@@ -8,7 +8,16 @@ on:
       - iac-cicd
     paths:  
       - terraform/**
-  workflow_dispatch: # Enables manual trigger for destroy job
+  workflow_dispatch:
+    inputs:
+      action:
+        description: 'Action to perform (deploy or destroy)'
+        required: true
+        default: 'deploy'
+        type: choice
+        options:
+          - deploy
+          - destroy
 
 # Environment Variables
 env:
@@ -23,8 +32,7 @@ jobs:
   terraform:
     name: "Deploy Infra with Terraform on AWS"
     runs-on: ubuntu-latest
-    # Run only on push events
-    if: github.event_name == 'push'  
+    if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'deploy')
 
     defaults:
       run:
@@ -78,8 +86,7 @@ jobs:
   destroy:
     name: "Destroy Infra on AWS"
     runs-on: ubuntu-latest
-    # Only trigger for workflow_dispatch
-    if: github.event_name == 'workflow_dispatch'
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'destroy'
 
     defaults:
       run:
