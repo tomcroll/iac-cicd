@@ -77,6 +77,7 @@ module "ecr" {
   repository_type    = "private"
 
   create_lifecycle_policy = false
+  repository_image_tag_mutability = "MUTABLE"
 
   tags = {
     Terraform = "true"
